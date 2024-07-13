@@ -9,6 +9,7 @@ on:
     branches: [ main ]
 jobs:
   docker-images:
+    if: ${{ vars.BUILD_DOCKER_ENABLED == 'true' }}
     name: Docker Images
     permissions:
       packages: write
