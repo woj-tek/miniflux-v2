@@ -3,13 +3,12 @@ on:
   schedule:
     - cron: '0 1 * * *'
   push:
-    tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
-  pull_request:
-    branches: [ main ]
+  #   tags:
+  #     - '[0-9]+.[0-9]+.[0-9]+'
+  # pull_request:
+  #   branches: [ main ]
 jobs:
   docker-images:
-    if: ${{ vars.BUILD_DOCKER_ENABLED == 'true' }}
     name: Docker Images
     permissions:
       packages: write
@@ -57,6 +56,7 @@ jobs:
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
+        if: ${{ vars.PUBLISH_DOCKER_IMAGE_ENABLED == 'true' }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -64,6 +64,7 @@ jobs:
       - name: Login to GitHub Container Registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
+        if: ${{ vars.PUBLISH_DOCKER_IMAGE_ENABLED == 'true' }}
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -72,6 +73,7 @@ jobs:
       - name: Login to Quay Container Registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
+        if: ${{ vars.PUBLISH_DOCKER_IMAGE_ENABLED == 'true' }}
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
@@ -79,6 +81,7 @@ jobs:
 
       - name: Build and Push Alpine images
         uses: docker/build-push-action@v6
+        if: ${{ vars.PUBLISH_DOCKER_IMAGE_ENABLED == 'true' }}
         with:
           context: .
           file: ./packaging/docker/alpine/Dockerfile
@@ -88,6 +91,7 @@ jobs:
 
       - name: Build and Push Distroless images
         uses: docker/build-push-action@v6
+        if: ${{ vars.PUBLISH_DOCKER_IMAGE_ENABLED == 'true' }}
         with:
           context: .
           file: ./packaging/docker/distroless/Dockerfile
